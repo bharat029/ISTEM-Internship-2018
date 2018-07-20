@@ -22,7 +22,7 @@ class LDA:
             
     def run_lda(self, processed_sentences):       
         lemmatizer = nltk.stem.wordnet.WordNetLemmatizer()
-        # List containing the final topic keywords
+        # list containing the final topic keywords
         topic_top_words = []
     
         documents = [comment.split() for comment in processed_sentences if comment]
