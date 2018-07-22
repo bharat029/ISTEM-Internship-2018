@@ -2,7 +2,7 @@ import gensim
 from gensim import corpora, models
 from preprocessing import get_sentenses
 
-processed_result = get_sentenses('finalDataSet_1.txt')
+processed_result = get_sentenses('KeyPhrasesOfDescriptions.txt')
 texts = []
 discriptions = []
 
@@ -28,13 +28,13 @@ for topic_no in range(8):
 	temp = ''
 	for comment in topic_probabilities:
 		if topic_probabilities[comment] == topic_no:
-			temp += comment + '\n\n'
+			temp += comment 
 	cluster.append(temp)
 
 for i in cluster:
-	print(i)
+	print(len(i))
 
-fhand = open('cluster_LDA.txt', 'w')
+fhand = open('cluster_LDA_1.txt', 'w')
 
 for i in cluster:
 	fhand.write(i + '\n\n\n')
