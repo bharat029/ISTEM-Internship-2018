@@ -1,9 +1,10 @@
 import nltk
 from string import punctuation
 from nltk.corpus import stopwords
+import json
 
 stop_words = stopwords.words('english')
-custom_stop_words = ['nil', 'system', 'someone', 'build', 'engineering', 'need', 'user', 'area', 'study', 'passionate', 'medium', 'time', 'computer', 'field', 'interest', 'company', 'thing', 'learn', 'experience','help', 'love', 'skill', 'want', 'bring', 'tech', 'technology', 'people', 'person', 'life', 'family', 'use', 'would', 'work', 'matter', 'idea', 'way', 'skill', 'program', 'project']
+custom_stop_words = ['nil', 'system', 'areas', 'world', 'ideas', 'things', 'society', 'someone', 'build', 'engineering', 'need', 'user', 'area', 'study', 'future', 'passion', 'passionate', 'medium', 'time', 'computer', 'field', 'interest', 'company', 'thing', 'learn', 'experience','help', 'love', 'skill', 'want', 'bring', 'tech', 'technology', 'people', 'person', 'life', 'family', 'use', 'would', 'work', 'matter', 'idea', 'way', 'skill', 'program', 'project']
 #custom_stop_words = ['nil']
 lemmatizer = nltk.stem.wordnet.WordNetLemmatizer()
 
@@ -41,7 +42,7 @@ def processComment(comment):
         return ' '.join(sentence_words)
     except Exception as e:
         return ""
-
+    
 def get_sentenses(fname):
     fhand = open(fname, errors = 'ignore')
      
@@ -66,6 +67,59 @@ def get_sentenses(fname):
 
     return preprocessing_result
 
+def get_lemma(phrase):
+    pos_tag = nltk.pos_tag(nltk.word_tokenize(phrase))
+    if 'NN' in pos_tag[0][1] or 'NP' in pos_tag[0][1]:
+        lemma = lemmatizer.lemmatize(pos_tag[0][0])
+        if lemma not in custom_stop_words:
+            phrase = lemma
+        elif 'VB' in pos_tag[0][1]:
+            lemma = lemmatizer.lemmatize(pos_tag[0][0], 'v')
+        if lemma not in custom_stop_words:
+            phrase = lemma
+        
+    return phrase
+
+
+def get_phrases(fname):
+    with open(fname) as f:
+        data = f.read().casefold()
+        data = json.loads(data)
+        
+    keyPhrases = []
+    for i in data['documents']:
+        keyPhrases.append(i['keyphrases'])
+    
+    histo = {}
+    
+    for keyPhrase in keyPhrases:
+        for phrase in keyPhrase:
+            if len(phrase.split()) == 1 and phrase in custom_stop_words: 
+                continue
+            if len(phrase.split()) == 1:
+                pos_tag = nltk.pos_tag(nltk.word_tokenize(phrase))
+                if 'NN' in pos_tag[0][1] or 'NP' in pos_tag[0][1]:
+                    lemma = lemmatizer.lemmatize(pos_tag[0][0])
+                    if lemma not in custom_stop_words:
+                        phrase = lemma
+                elif 'VB' in pos_tag[0][1]:
+                    lemma = lemmatizer.lemmatize(pos_tag[0][0], 'v')
+                    if lemma not in custom_stop_words:
+                        phrase = lemma
+
+            histo[phrase] = histo.get(phrase, 0) + 1
+    
+    result = sorted(histo.items(), key = lambda x : x[1], reverse = True)
+
+    with open('KeyPhrasesOfDescriptions.txt', 'w') as f:
+        for keyPhrase in keyPhrases:
+            for phrase in keyPhrase:
+                if phrase in histo:
+                    if len(phrase.split()) == 1:
+                        phrase = get_lemma(phrase)
+                    f.write(phrase + ', ')
+            f.write('\n')
+            
 if __name__ == '__main__':
-    get_sentenses('finalDataSet.txt')
+    get_phrases('finalDataSet_2_results.json')
     print('Done')

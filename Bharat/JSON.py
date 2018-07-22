@@ -1,4 +1,5 @@
 import json
+import requests
  
 fhand = open('finalDataSet_2.txt')
  
@@ -11,25 +12,13 @@ for line in data:
     json_data["documents"].append(temp)
     id += 1
      
-########### Python 3.2 #############
-import http.client, urllib.request, urllib.parse, urllib.error, base64
-
-headers = {
-    # Request headers
-    'Content-Type': 'application/json',
-    'Ocp-Apim-Subscription-Key': '{a1cd3c4c72724acfb1906f6462367099}',
-}
-
-params = urllib.parse.urlencode(json_data)
-
-try:
-    conn = http.client.HTTPSConnection('australiaeast.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases')
-    conn.request("POST", "/text/analytics/v2.0/keyPhrases?%s" % params, "{body}", headers)
-    response = conn.getresponse()
-    data = response.read()
-    print(data)
-    conn.close()
-except Exception as e:
-    print("[Errno {0}] {1}".format(e.errno, e.strerror))
-
-####################################
+# subscription key and base url
+subscription_key = "a1cd3c4c72724acfb1906f6462367099"
+assert subscription_key
+text_analytics_base_url =  "https://australiaeast.api.cognitive.microsoft.com/text/analytics/v2.0/" 
+key_phrase_api_url = text_analytics_base_url + "keyPhrases"
+headers   = {'Ocp-Apim-Subscription-Key': subscription_key}
+response  = requests.post(key_phrase_api_url, headers=headers, json=json_data)
+key_phrases = response.json()
+with open('finalDataSet_2_results.json', 'w') as f:
+    json.dump(key_phrases, f, indent = 2)
