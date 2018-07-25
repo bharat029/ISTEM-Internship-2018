@@ -47,9 +47,7 @@ def get_sentenses(fname):
     fhand = open(fname, errors = 'ignore')
      
     preprocessing_result = {}
-    data = fhand.read()
-    
-    actual_sentenses = data.split('\n\n')
+    actual_sentenses = fhand.readlines()
     preprocessed_sentenses = []
               
     for i in actual_sentenses:

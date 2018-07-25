@@ -88,15 +88,13 @@ class LDA:
                 for j in range(self.number_of_topics):
                     try:
                        # probability = sum([1.0 for component in topic_words_and_probs[j] if component[0] in words and component[1] > 0.01]) / float(useful_words_len)
-#                          print(max([component[1] for component in topic_words_and_probs[j] if component[0] in words]))
                         probability = sum([1.0 for component in topic_words_and_probs[j] if component[0] in words and component[1] > 0.01]) / float(useful_words_len)  
                     except:
                         probability = 0
                     
-                    if probability > 0.5:
+                    if probability > 0.02:
                         best_topics.append(j)
 
-                print(max_probability)
                 for topic in best_topics:
                     out.append({
                         'comment': processed_sentences[idx],
@@ -123,14 +121,22 @@ class LDA:
         result = self.process_result(processed_result, topic_top_words, topic_words_and_probs)
         clusters = []
         actual_clusters = []
-
+        with open('finalDataSet_2.txt') as f:
+            dataSet = f.readlines()
+        with open('KeyPhrasesOfDescriptions.txt') as f:
+            KeyPhrases = f.readlines()
+            
+        data_to_keyPhrases = {}
+        for i in range(len(dataSet)):
+            data_to_keyPhrases[KeyPhrases[i]] = dataSet[i]
+    
         for i in range(self.number_of_topics):
             temp = ''            
             temp1 = ''
             for j in result:
                 if j['topic'] == i:
                     temp += j['comment'] + '\n\n'
-                    temp1 += processed_result[j['comment']] + '\n\n'
+                    temp1 += data_to_keyPhrases[processed_result[j['comment']]]
             clusters.append(temp)
             actual_clusters.append(temp1)
                         
@@ -179,4 +185,4 @@ class LDA:
         return result
   
 if __name__ == '__main__':  
-    LDA(fname = 'finalDataSet_1.txt', number_of_topics = 5, number_of_lda_keywords = 20, number_of_lda_keywords_processed = 50, number_of_lda_keywords_for_assignment = 500)
+    LDA(fname = 'KeyPhrasesOfDescriptions.txt', number_of_topics = 5, number_of_lda_keywords = 20, number_of_lda_keywords_processed = 50, number_of_lda_keywords_for_assignment = 500)
