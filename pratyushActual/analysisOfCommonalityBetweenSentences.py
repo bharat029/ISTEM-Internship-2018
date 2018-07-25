@@ -1,11 +1,22 @@
 # modules to be used
 import string
 
+# reading data from the actual database
+entireData = []
+fp = open("finalDataSet_2.txt", "r")
+line = fp.readline()
+while(line) :
+	line = line.rstrip("\n")
+	entireData.append(line)
+	line = fp.readline()
+fp.close()
+
 # reading data from the file
-fp = open("finalDataSet2_result.txt", "r")
+fp = open("KeyPhrasesOfDescriptions.txt", "r")
 line = fp.readline()
 sentences = []
 while(line) :
+	line = line.rstrip("\n")
 	sentences.append(line)
 	line = fp.readline()
 fp.close()
@@ -32,6 +43,7 @@ commonPhrases = {}
 for i in range (0, length) :
 	outerList = sentences[i].split(",")
 	for j in range (i+1, length) :
+		testing = []
 		innerList = sentences[j].split(",")
 		temp = list(set(outerList).intersection(innerList))
 		lengthOfIntersection = len(temp)
@@ -41,13 +53,19 @@ for i in range (0, length) :
 		scoreMatrix[i][j] = result
 		scoreMatrix[j][i] = result
 		index = str(i) +" " +  str(j)
-		commonPhrases[index] = temp
+		testing.append(temp)
+		testing.append(entireData[i])
+		testing.append(entireData[j])
+		commonPhrases[index] = testing
 
 # writing the results to a file
-fp = open("resultOfCoefficient.txt", "w")
-fp.write("The coefficient matrix is:" + "\n")
-fp.write(str(scoreMatrix) + "\n")
-fp.write("The dictionary containing common sentences between any two sentences is:" + "\n")
-fp.write(str(commonPhrases) + "\n")
+fp = open("resultOfAnalysis.txt", "w")
+for c in commonPhrases:
+	if(len(commonPhrases[c][0]) != 1):
+		fp.write(str(c) + "\n")
+		fp.write(str(commonPhrases[c][0]) + "\n")
+		fp.write(str(commonPhrases[c][1]) + "\n")
+		fp.write(str(commonPhrases[c][2]) + "\n")
+		fp.write("\n")
 fp.close()
 # end of file 
