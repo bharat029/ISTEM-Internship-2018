@@ -39,12 +39,15 @@ for i in range(0, length) :
 # dictionary to hold the common phrases between any two sentences
 commonPhrases = {}
 
+# list to hold the list of indexes
+listOfIndex = []
+
 # processing the data for jecard coefficient and filling of the dictionary
 for i in range (0, length) :
-	outerList = sentences[i].split(",")
+	outerList = sentences[i].split(", ")
 	for j in range (i+1, length) :
 		testing = []
-		innerList = sentences[j].split(",")
+		innerList = sentences[j].split(", ")
 		temp = list(set(outerList).intersection(innerList))
 		lengthOfIntersection = len(temp)
 		lengthOfUnion = len(list(set().union(outerList,innerList)))
@@ -53,6 +56,7 @@ for i in range (0, length) :
 		scoreMatrix[i][j] = result
 		scoreMatrix[j][i] = result
 		index = str(i) +" " +  str(j)
+		listOfIndex.append(index)
 		testing.append(temp)
 		testing.append(entireData[i])
 		testing.append(entireData[j])
@@ -60,7 +64,7 @@ for i in range (0, length) :
 
 # writing the results to a file
 fp = open("resultOfAnalysis.txt", "w")
-for c in commonPhrases:
+for c in listOfIndex:
 	if(len(commonPhrases[c][0]) != 1):
 		fp.write(str(c) + "\n")
 		fp.write(str(commonPhrases[c][0]) + "\n")
